@@ -11,13 +11,14 @@ struct ContentView: View {
     
     @State private var users: [User] = []
     @State private var products: [Product] = []
-
+    
     var body: some View {
         VStack {
             ScrollView {
                 VStack {
                     ForEach(products) { product in
                         Text(product.title)
+                            .foregroundStyle(.spotifyGreen)
                     }
                 }
             }
@@ -33,7 +34,6 @@ struct ContentView: View {
         do {
             users = try await DataBaseHelper().getUsers()
             products = try await DataBaseHelper().getProducts()
-
         } catch {
             
         }
