@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftfulUI
 
 struct SpotifyHomeView: View {
     @State private var currentUser: User? = nil
+    @State private var products: [Product] = []
     @State private var selectedCategory: Category? = nil
     
     var body: some View {
@@ -16,17 +18,25 @@ struct SpotifyHomeView: View {
             Color.spotifyBlack.ignoresSafeArea()
             
             ScrollView(.vertical) {
-                LazyVStack(spacing: 1, pinnedViews: [.sectionHeaders], content: {
-                    Section {
-                        ForEach(0..<20) { _ in
-                            Rectangle()
-                                .fill(Color.red)
-                                .frame(width: 200, height: 200)
+                LazyVStack(
+                    spacing: 1,
+                    pinnedViews: [.sectionHeaders],
+                    content: {
+                        Section {
+                            recentsCell
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 16)
+
+                            
+                            if let product = products.first {
+                                newReleaseCell(product: product)
+                                    .padding(.horizontal, 16)
+                            }
+                        } header: {
+                            header
                         }
-                    } header: {
-                        header
-                    }
-                })
+                    })
+                .padding(.top, 8)
             }
             .scrollIndicators(.hidden)
             .clipped()
@@ -34,6 +44,42 @@ struct SpotifyHomeView: View {
         .task {
             await getData()
         }
+    }
+    
+    private var recentsCell: some View {
+        NonLazyVGrid(
+            columns: 2,
+            alignment: .center,
+            spacing: 10,
+            items: products,
+            content: { product in
+                if let product {
+                    SpotifyRecentsCell(
+                        imageName: product.firstImage,
+                        title: product.title
+                    )
+                    .asButton(.press) {
+                        print("presed: \(product.title)")
+                    }
+                }
+            }
+        )
+    }
+    
+    private func newReleaseCell(product: Product) -> some View {
+        SpotifyNewReleaseCell(
+            imageName: product.firstImage,
+            headline: product.title,
+            subHeadline: product.title,
+            title: product.title,
+            description: product.title,
+            onAddToPlaylistPressed: {
+                
+            },
+            onPlayPressed: {
+                
+            }
+        )
     }
     
     private var header: some View {
@@ -61,13 +107,14 @@ struct SpotifyHomeView: View {
                     }
                     
                 }
-                .padding(.horizontal, 10)
+                .padding(.horizontal, 16)
             }
             .scrollIndicators(.hidden)
             
         }
         .padding(.vertical, 24)
         .padding(.leading, 8)
+        .frame(maxWidth: .infinity)
         .background(.spotifyBlack)
         
     }
@@ -75,6 +122,7 @@ struct SpotifyHomeView: View {
     private func getData() async {
         do {
             currentUser = try await DataBaseHelper().getUsers().first
+            products = try await Array(DataBaseHelper().getProducts().prefix(8))
         } catch {
             
         }

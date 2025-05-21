@@ -11,7 +11,7 @@ import SwiftUI
 struct SwiftUIinPracticeApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SpotifyHomeView()
         }
     }
 }
