@@ -15,11 +15,9 @@ struct SpotifyNewReleaseCell: View {
     var description: String? = "is description"
     var onAddToPlaylistPressed: (() -> Void)? = nil
     var onPlayPressed: (() -> Void)? = nil
-
-
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(spacing: 16) {
             HStack(spacing: 8) {
                 ImageLoaderView(urlString: imageName)
                     .frame(width: 50, height: 50)
@@ -49,7 +47,7 @@ struct SpotifyNewReleaseCell: View {
                 ImageLoaderView(urlString: imageName)
                     .frame(width: 140, height: 140)
                 
-                VStack(alignment: .leading, spacing: 32) {
+                VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 2) {
                         if let title {
                             Text(title)
@@ -60,13 +58,13 @@ struct SpotifyNewReleaseCell: View {
                         if let description {
                             Text(description)
                                 .foregroundStyle(.spotifyLightGray)
-
+                                .lineLimit(2)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .font(.callout)
+                    .padding(.top, 5)
                     
-                    HStack {
+                    HStack (spacing: 0){
                         Image(systemName: "plus.circle")
                             .foregroundStyle(.spotifyLightGray)
                             .font(.title3)
@@ -84,7 +82,7 @@ struct SpotifyNewReleaseCell: View {
                             .foregroundStyle(.spotifyWhite)
                             .font(.title)
                     }
-                    .padding(.bottom, 2)
+                    .padding(.bottom, 5)
                 }
                 .padding(.trailing, 16)
 

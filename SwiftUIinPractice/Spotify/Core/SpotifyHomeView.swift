@@ -12,14 +12,15 @@ struct SpotifyHomeView: View {
     @State private var currentUser: User? = nil
     @State private var products: [Product] = []
     @State private var selectedCategory: Category? = nil
-    
+    @State private var productRows: [ProductRow] = []
+
     var body: some View {
         ZStack {
             Color.spotifyBlack.ignoresSafeArea()
             
             ScrollView(.vertical) {
                 LazyVStack(
-                    spacing: 1,
+                    spacing: 2,
                     pinnedViews: [.sectionHeaders],
                     content: {
                         Section {
@@ -32,11 +33,13 @@ struct SpotifyHomeView: View {
                                 newReleaseCell(product: product)
                                     .padding(.horizontal, 16)
                             }
+                            
+                            listRows
+                            
                         } header: {
                             header
                         }
                     })
-                .padding(.top, 8)
             }
             .scrollIndicators(.hidden)
             .clipped()
@@ -69,18 +72,56 @@ struct SpotifyHomeView: View {
     private func newReleaseCell(product: Product) -> some View {
         SpotifyNewReleaseCell(
             imageName: product.firstImage,
-            headline: product.title,
-            subHeadline: product.title,
+            headline: product.brand,
+            subHeadline: product.category,
             title: product.title,
-            description: product.title,
+            description: product.description,
             onAddToPlaylistPressed: {
-                
+                print("onAddToPlaylistPressed: \(product.title)")
             },
             onPlayPressed: {
-                
+                print("onPlayPressed: \(product.title)")
             }
         )
     }
+    
+    private var listRows: some View {
+        ForEach(productRows) { row in
+            VStack(spacing: 2) {
+                Text(row.title)
+                           .font(.title)
+                           .fontWeight(.semibold)
+                           .foregroundStyle(.spotifyWhite)
+                           .frame(maxWidth: .infinity, alignment: .leading)
+                           .padding(.horizontal, 16)
+                           .padding(.top, 8)
+
+                
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(products) { product in
+                            ImageTitleRowCell(
+                                imageSize: 120,
+                                imageName: product.firstImage,
+                                title: product.title
+                            )
+                            .asButton(.press) {
+                                print("onPlayPressed: \(product.title)")
+                            }
+                        }
+
+                    }
+
+                }
+//                .background(Color.red)
+                .scrollIndicators(.hidden)
+
+            }
+            .padding(.horizontal, 8)
+        }
+        
+    }
+
     
     private var header: some View {
         HStack(spacing: 0) {
@@ -123,6 +164,16 @@ struct SpotifyHomeView: View {
         do {
             currentUser = try await DataBaseHelper().getUsers().first
             products = try await Array(DataBaseHelper().getProducts().prefix(8))
+            
+            var rows: [ProductRow] = []
+            
+            let allBrands = Set(products.map({ $0._brand }))
+            for brand in allBrands {
+//                let products = self.products.filter({ $0.brand == brand })
+                rows.append(ProductRow(title: brand.capitalized, products: products))
+            }
+            productRows = rows
+            
         } catch {
             
         }
