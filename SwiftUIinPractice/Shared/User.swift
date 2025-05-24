@@ -17,12 +17,27 @@ struct UserArray: Codable {
 // MARK: - User
 struct User: Codable, Identifiable {
     let id: Int
-    let firstName, lastName, maidenName: String
+    let firstName, lastName: String
     let age: Int
     let email, phone, username, password: String
-    let birthDate: String
     let image: String
-    let bloodGroup: String
-    let height, weight: Double
-    let eyeColor: String
+    let height: Double // <- Double not Int
+    let weight: Double
+    
+    
+    static var mock: User {
+        User(
+            id: 444,
+            firstName: "Nick",
+            lastName: "Sarno",
+            age: 76,
+            email: "hi@hi.com",
+            phone: "",
+            username: "Vũ",
+            password: "",
+            image: Contants.randomImage,
+            height: 180,
+            weight: 200
+        )
+    }
 }
